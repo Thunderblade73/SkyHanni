@@ -207,6 +207,9 @@ object SackAPI {
                 it.startsWith("Removed")
             }
         } ?: ""
+        if(sackDisplayConfig.compactSackChat) {
+            event.isCanceled = true
+        }
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return

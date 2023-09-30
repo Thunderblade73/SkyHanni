@@ -226,6 +226,12 @@ public class InventoryConfig {
 
         @Expose
         public Position position = new Position(144, 139, false, true);
+
+        @Expose
+        @ConfigOption(name = "Compact Chat Message", desc = "Compacts the Chat Message")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean compactSackChat = true;
     }
 
     @Expose
