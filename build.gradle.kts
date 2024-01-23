@@ -103,7 +103,7 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha26:all") {
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha24:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -114,7 +114,7 @@ dependencies {
     implementation(libs.hotswapagentforge)
 
 //    testImplementation(kotlin("test"))
-    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha26:all") {
+    testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:v2.1.1-alpha24:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
