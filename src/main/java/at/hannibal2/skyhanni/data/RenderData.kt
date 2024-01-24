@@ -49,9 +49,7 @@ class RenderData {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        GlStateManager.pushMatrix()
         LorenzRenderWorldEvent(event.partialTicks).postAndCatch()
-        GlStateManager.popMatrix()
     }
 
     // TODO find better spot for this
