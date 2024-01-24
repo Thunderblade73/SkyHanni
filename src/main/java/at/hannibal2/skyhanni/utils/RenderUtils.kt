@@ -118,7 +118,7 @@ object RenderUtils {
         Minecraft.getMinecraft().textureManager.bindTexture(beaconBeam)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0f)
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0f)
-        GlStateManager.disableLighting()
+        //GlStateManager.disableLighting()
         GlStateManager.enableCull()
         GlStateManager.enableTexture2D()
         GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0)
@@ -780,7 +780,7 @@ object RenderUtils {
 
     fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
+        //GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
         GlStateManager.disableTexture2D()
         val tessellator = Tessellator.getInstance()
@@ -937,7 +937,7 @@ object RenderUtils {
         partialTicks: Float = 0F,
     ) {
         GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
+        //GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.disableTexture2D()
         GlStateManager.disableCull()
