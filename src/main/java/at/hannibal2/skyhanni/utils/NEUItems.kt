@@ -236,6 +236,9 @@ object NEUItems {
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
+
+        RenderHelper.enableGUIStandardItemLighting()
+        RenderHelper.disableStandardItemLighting()
     }
 
     private object AdjustStandardItemLighting {
