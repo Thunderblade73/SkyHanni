@@ -229,9 +229,6 @@ object NEUItems {
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
-
-        RenderHelper.enableGUIStandardItemLighting()
-        RenderHelper.disableStandardItemLighting()
     }
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
