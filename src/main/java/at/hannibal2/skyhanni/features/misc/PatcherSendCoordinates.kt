@@ -347,6 +347,7 @@ class PatcherSendCoordinates {
                     fontRenderer.drawString(beacon.name, -j, i, colorCode)
 
                     fontRenderer.drawString(beacon.name, -j, i, -1)
+                    fontRenderer.drawString(" ",-j, i,LorenzColor.WHITE.toColor().rgb)
 
                     GlStateManager.popMatrix()
                 }
