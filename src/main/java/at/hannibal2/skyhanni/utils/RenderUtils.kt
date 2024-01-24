@@ -34,7 +34,7 @@ import kotlin.time.DurationUnit
 
 object RenderUtils {
 
-    private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
+    val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     infix fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
