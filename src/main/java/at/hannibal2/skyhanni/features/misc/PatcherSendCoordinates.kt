@@ -16,6 +16,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+
+
+
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.AxisAlignedBB
@@ -65,6 +68,7 @@ class PatcherSendCoordinates {
         for (beacon in patcherBeacon) {
             val location = beacon.location
 
+            GlStateManager.pushMatrix()
             //drawColor
             run {
                 val color = LorenzColor.DARK_GREEN.toColor()
@@ -78,20 +82,15 @@ class PatcherSendCoordinates {
                 } else {
                     1f
                 }
-                GlStateManager.disableDepth()
-                GlStateManager.disableCull()
+
                 //drawFilledBoundingBox
                 run {
                     val aabb = AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock()
-                    GlStateManager.enableBlend()
+
                     //GlStateManager.disableLighting()
-                    GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-                    GlStateManager.disableTexture2D()
+
                     val tessellator = Tessellator.getInstance()
                     val worldRenderer = tessellator.worldRenderer
-                    GlStateManager.color(
-                        color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f * realAlpha
-                    )
                     //vertical
                     worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
                     worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
@@ -105,12 +104,6 @@ class PatcherSendCoordinates {
                     worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
                     worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
                     tessellator.draw()
-                    GlStateManager.color(
-                        color.red / 255f * 0.8f,
-                        color.green / 255f * 0.8f,
-                        color.blue / 255f * 0.8f,
-                        color.alpha / 255f * realAlpha
-                    )
                     //x
                     worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
                     worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
@@ -124,12 +117,7 @@ class PatcherSendCoordinates {
                     worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
                     worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
                     tessellator.draw()
-                    GlStateManager.color(
-                        color.red / 255f * 0.9f,
-                        color.green / 255f * 0.9f,
-                        color.blue / 255f * 0.9f,
-                        color.alpha / 255f * realAlpha
-                    )
+
                     //z
                     worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
                     worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
@@ -143,15 +131,12 @@ class PatcherSendCoordinates {
                     worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
                     worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
                     tessellator.draw()
-                    GlStateManager.enableTexture2D()
-                    GlStateManager.disableBlend()
+
                 }
-                GlStateManager.disableTexture2D()
+
                 // if (distSq > 5 * 5 && false) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, event.partialTicks)
                 //GlStateManager.disableLighting()
-                GlStateManager.enableTexture2D()
-                GlStateManager.enableDepth()
-                GlStateManager.enableCull()
+
             }
             //drawWaypointFilled
             run {
@@ -162,8 +147,7 @@ class PatcherSendCoordinates {
                 val z = location.z - viewerZ
                 val distSq = x * x + y * y + z * z
                 if (true) {
-                    GlStateManager.disableDepth()
-                    GlStateManager.disableCull()
+
                 }
                 //drawFilledBoundingBox
                 run {
@@ -172,13 +156,12 @@ class PatcherSendCoordinates {
                         x + 1 + 0.0, y + 1 + 0.0, z + 1 + 0.0
                     ).expandBlock()
                     val alphaMultiplier = (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
-                    GlStateManager.enableBlend()
+
                     //GlStateManager.disableLighting()
-                    GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
-                    GlStateManager.disableTexture2D()
+
                     val tessellator = Tessellator.getInstance()
                     val worldRenderer = tessellator.worldRenderer
-                    GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f * alphaMultiplier)
+
                     //vertical
                     worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
                     worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
@@ -192,12 +175,7 @@ class PatcherSendCoordinates {
                     worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
                     worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
                     tessellator.draw()
-                    GlStateManager.color(
-                        color.red / 255f * 0.8f,
-                        color.green / 255f * 0.8f,
-                        color.blue / 255f * 0.8f,
-                        color.alpha / 255f * alphaMultiplier
-                    )
+
                     //x
                     worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
                     worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
@@ -211,12 +189,7 @@ class PatcherSendCoordinates {
                     worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
                     worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
                     tessellator.draw()
-                    GlStateManager.color(
-                        color.red / 255f * 0.9f,
-                        color.green / 255f * 0.9f,
-                        color.blue / 255f * 0.9f,
-                        color.alpha / 255f * alphaMultiplier
-                    )
+
                     //z
                     worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
                     worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
@@ -230,10 +203,9 @@ class PatcherSendCoordinates {
                     worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
                     worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
                     tessellator.draw()
-                    GlStateManager.enableTexture2D()
-                    GlStateManager.disableBlend()
+
                 }
-                GlStateManager.disableTexture2D()
+
                 if (distSq > 5 * 5 && true)
                     //renderBeaconBeam
                     run {
@@ -244,14 +216,9 @@ class PatcherSendCoordinates {
                         val tessellator = Tessellator.getInstance()
                         val worldrenderer = tessellator.worldRenderer
                         Minecraft.getMinecraft().textureManager.bindTexture(RenderUtils.beaconBeam)
-                        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0f)
-                        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0f)
+
                         //GlStateManager.disableLighting()
-                        GlStateManager.enableCull()
-                        GlStateManager.enableTexture2D()
-                        GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0)
-                        GlStateManager.enableBlend()
-                        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+
                         val time = Minecraft.getMinecraft().theWorld.totalWorldTime + event.partialTicks.toDouble()
                         val d1 = MathHelper.func_181162_h(
                             -time * 0.2 - MathHelper.floor_double(-time * 0.1)
@@ -297,7 +264,6 @@ class PatcherSendCoordinates {
                         worldrenderer.pos(x + d4, y1 + topOffset, z + d5).tex(0.0, d15).color(r, g, b, 1.0f * 1.0f)
                             .endVertex()
                         tessellator.draw()
-                        GlStateManager.disableCull()
                         val d12 = -1.0 + d1
                         val d13 = height + d12
                         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR)
@@ -328,17 +294,11 @@ class PatcherSendCoordinates {
                         tessellator.draw()
                     }
                 //GlStateManager.disableLighting()
-                GlStateManager.enableTexture2D()
-                if (true) {
-                    GlStateManager.enableDepth()
-                    GlStateManager.enableCull()
-                }
                 Unit
             }
             //drawString
             run {
                 val location1 = location.add(0.5, 0.5, 0.5)
-                GlStateManager.alphaFunc(516, 0.1f)
                 GlStateManager.pushMatrix()
                 val viewer = Minecraft.getMinecraft().renderViewEntity
                 val renderManager = Minecraft.getMinecraft().renderManager
@@ -352,10 +312,7 @@ class PatcherSendCoordinates {
                     y *= 12 / dist
                     z *= 12 / dist
                 }
-                if (true) {
-                    GlStateManager.disableDepth()
-                    GlStateManager.disableCull()
-                }
+
                 GlStateManager.translate(x, y, z)
                 GlStateManager.translate(0f, viewer.eyeHeight, 0f)
                 //drawNametag
@@ -373,27 +330,24 @@ class PatcherSendCoordinates {
                     )
                     GlStateManager.scale(-f1, -f1, f1)
                     //GlStateManager.disableLighting()
-                    GlStateManager.depthMask(false)
-                    GlStateManager.enableBlend()
-                    GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+
                     val tessellator = Tessellator.getInstance()
                     val worldrenderer = tessellator.worldRenderer
                     val i = 0
                     val j = fontRenderer.getStringWidth(beacon.name) / 2
-                    GlStateManager.disableTexture2D()
+
                     worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
                     worldrenderer.pos((-j - 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
                     worldrenderer.pos((-j - 1).toDouble(), (8 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
                     worldrenderer.pos((j + 1).toDouble(), (8 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
                     worldrenderer.pos((j + 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
                     tessellator.draw()
-                    GlStateManager.enableTexture2D()
+
                     val colorCode = LorenzColor.DARK_BLUE.toColor()?.rgb ?: 553648127
                     fontRenderer.drawString(beacon.name, -j, i, colorCode)
-                    GlStateManager.depthMask(true)
+
                     fontRenderer.drawString(beacon.name, -j, i, -1)
-                    GlStateManager.enableBlend()
-                    GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+
                     GlStateManager.popMatrix()
                 }
                 GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
@@ -403,12 +357,8 @@ class PatcherSendCoordinates {
                 GlStateManager.rotate(renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
                 GlStateManager.popMatrix()
                 //GlStateManager.disableLighting()
-                if (true) {
-                    GlStateManager.enableDepth()
-                    GlStateManager.enableCull()
-                }
-                Unit
             }
+            GlStateManager.popMatrix()
         }
     }
 
