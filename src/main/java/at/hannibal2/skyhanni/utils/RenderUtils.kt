@@ -93,7 +93,7 @@ object RenderUtils {
         )
         GlStateManager.disableTexture2D()
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
-        GlStateManager.disableLighting()
+        //GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()
         GlStateManager.enableCull()
@@ -235,7 +235,7 @@ object RenderUtils {
         GlStateManager.rotate(-renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
         GlStateManager.rotate(renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
         GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
+        //GlStateManager.disableLighting()
 
 
         if (seeThroughBlocks) {

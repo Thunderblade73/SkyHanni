@@ -39,7 +39,7 @@ object GriffinUtils {
         )
         GlStateManager.disableTexture2D()
         if (distSq > 5 * 5 && beacon) RenderUtils.renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
-        GlStateManager.disableLighting()
+        //GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
 
         if (seeThroughBlocks) {
