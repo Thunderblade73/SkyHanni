@@ -35,6 +35,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 object NEUItems {
+
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
     private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
@@ -152,6 +153,27 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
+    enum class PriceOption {
+        NPC,
+        SELL_OFFER_OR_LBIN,
+        BUY_ORDER_OR_AVERAGE_PRICES,
+    }
+
+    fun NEUInternalName.getPriceOrNull(option: PriceOption): Double? {
+        return when (option) {
+            PriceOption.NPC -> this.getNpcPriceOrNull();
+            PriceOption.SELL_OFFER_OR_LBIN -> this.getPriceOrNull(true);
+            PriceOption.BUY_ORDER_OR_AVERAGE_PRICES -> if (manager.auctionManager.getBazaarInfo(this.asString()) == null) {
+                manager.auctionManager.getItemAvgBin(this.asString());
+            } else {
+                this.getPriceOrNull(true);
+            }
+        }
+    }
+
+    fun NEUInternalName.getPrice(option: PriceOption) = getPriceOrNull(option) ?: -1.0
+
+    @Deprecated("", ReplaceWith("NEUInternalName.getPrice(option: PriceOption)"))
     fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
@@ -212,7 +234,6 @@ object NEUItems {
 
     fun isVanillaItem(item: ItemStack): Boolean =
         manager.auctionManager.isVanillaItem(item.getInternalName().asString())
-
 
     fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
         val item = checkBlinkItem()
@@ -327,7 +348,6 @@ object NEUItems {
         val result = Pair(internalName, 1)
         multiplierCache[internalName] = result
         return result
-
     }
 
     @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))
