@@ -36,8 +36,14 @@ object InventoryUtils {
 
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
-    fun getItemsInOwnInventory() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filterNotNull()
-    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+    fun getItemsInOwnInventory() =
+        getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
+
+    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
+
+    // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
+    fun getItemsInHotbar() =
+        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
 
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
@@ -98,6 +104,10 @@ object InventoryUtils {
             val stack = slot.stack ?: continue
             this[slot] = stack
         }
+    }
+
+    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? {
+        return getItemsInOpenChest().find { it.slotIndex == slotIndex }?.stack
     }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
