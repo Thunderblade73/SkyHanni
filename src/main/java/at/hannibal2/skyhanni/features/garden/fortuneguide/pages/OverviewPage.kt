@@ -39,14 +39,6 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         content.addTable(
             1,
-            FFInfos.ANITA_BUFF.bar(
-                "§2Anita Buff", if (FFTypes.ANITA.notSaved()) "§cAnita buff not saved\n§eVisit Anita to set it!"
-                else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
-            )
-        )
-
-        content.addTable(
-            2,
             FFInfos.FARMING_LEVEL.bar(
                 "§2Farming Level",
                 if (FFTypes.FARMING_LVL.notSaved()) "§cFarming level not saved\n§eOpen /skills to set it!"
@@ -55,20 +47,28 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         )
 
         content.addTable(
+            2,
+            FFInfos.GARDEN_PLOTS.bar(
+                "§2Garden Plots",
+                if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
+                else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked"
+            )
+        )
+
+        content.addTable(
             3,
-            FFInfos.COMMUNITY_SHOP.bar(
-                "§2Community upgrades",
-                if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
-                else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier"
+            FFInfos.ANITA_BUFF.bar(
+                "§2Anita Buff", if (FFTypes.ANITA.notSaved()) "§cAnita buff not saved\n§eVisit Anita to set it!"
+                else "§7§2Fortune for levelling your Anita extra crops\n§2You get 4☘ per buff level"
             )
         )
 
         content.addTable(
             4,
-            FFInfos.GARDEN_PLOTS.bar(
-                "§2Garden Plots",
-                if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n§eOpen /desk and view your plots to set it!"
-                else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked"
+            FFInfos.COMMUNITY_SHOP.bar(
+                "§2Community upgrades",
+                if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n§eVisit Elizabeth to set it!"
+                else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier"
             )
         )
 

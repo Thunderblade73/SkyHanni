@@ -12,15 +12,17 @@ internal enum class FFInfos(
         val backupEquip = FarmingItems.currentEquip
         FarmingItems.currentArmor = null
         FarmingItems.currentEquip = null
-        val total = maxSumToThis(it) + 100
+        val total = maxSumToThis(it)
         FarmingItems.currentArmor = backupArmor
         FarmingItems.currentEquip = backupEquip
         total
     }),
-    ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
+
     FARMING_LEVEL(UNIVERSAL, { FFStats.baseFF }, FFTypes.FARMING_LVL, 240),
-    COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
+    BESTIARY(UNIVERSAL, { FFStats.baseFF }, FFTypes.BESTIARY, 60),
     GARDEN_PLOTS(UNIVERSAL, { FFStats.baseFF }, FFTypes.PLOTS, 72),
+    ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
+    COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
     CAKE_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.CAKE, 5),
     TOTAL_ARMOR(UNIVERSAL, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.TOTAL),
     BASE_ARMOR(TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.BASE, {
