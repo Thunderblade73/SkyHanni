@@ -65,7 +65,7 @@ internal enum class FFInfos(
     PET_BASE(TOTAL_PET, { FarmingItems.currentPet.getFFData() }, FFTypes.BASE, {
         when (FarmingItems.currentPet) {
             FarmingItems.ELEPHANT -> 150
-            FarmingItems.MOOSHROOM_COW -> 157
+            FarmingItems.MOOSHROOM_COW -> 158
             FarmingItems.BEE -> 30
             else -> 0
         }
