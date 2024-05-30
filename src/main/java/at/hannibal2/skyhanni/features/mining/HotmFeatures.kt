@@ -40,7 +40,6 @@ class HotmFeatures {
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else
                 "§e${it.activeLevel}"
-            it.activeLevel.toString()
         }
     }
 
