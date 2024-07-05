@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.mojang.authlib.GameProfile
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -117,14 +118,16 @@ object EntityUtils {
         return false
     }
 
+    fun GameProfile.getSkinTexture(): String? = this.properties.entries()
+        .filter { it.key == "textures" }
+        .map { it.value }
+        .firstOrNull { it.name == "textures" }
+        ?.value
+
     fun EntityPlayer.getSkinTexture(): String? {
         val gameProfile = gameProfile ?: return null
 
-        return gameProfile.properties.entries()
-            .filter { it.key == "textures" }
-            .map { it.value }
-            .firstOrNull { it.name == "textures" }
-            ?.value
+        return gameProfile.getSkinTexture()
     }
 
     inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =
@@ -201,7 +204,7 @@ object EntityUtils {
         val mc = Minecraft.getMinecraft()
         return object : EntityOtherPlayerMP(
             mc.theWorld,
-            mc.thePlayer.gameProfile
+            mc.thePlayer.gameProfile,
         ) {
             override fun getLocationSkin() =
                 mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)

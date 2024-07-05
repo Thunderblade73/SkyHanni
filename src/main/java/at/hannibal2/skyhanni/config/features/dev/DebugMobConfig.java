@@ -4,7 +4,10 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.lwjgl.input.Keyboard;
 
 public class DebugMobConfig {
 
@@ -12,6 +15,16 @@ public class DebugMobConfig {
     @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all mobs.")
     @ConfigEditorBoolean
     public boolean enable = true;
+
+    @Expose
+    @ConfigOption(name = "Copy NPC", desc = "Copies an npc you hit into the a json for neu repo to the path specified below.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int copyNpc = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Copy NPC path", desc = "Path where the npc file will get saved.")
+    @ConfigEditorText
+    public String copyNpcPath = "";
 
     @Expose
     @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection.")
