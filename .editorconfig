@@ -1,6 +1,7 @@
 # top-most EditorConfig file
 root = true
 
+
 # All Files
 [*]
 # Unix-style newlines with a newline ending every file
