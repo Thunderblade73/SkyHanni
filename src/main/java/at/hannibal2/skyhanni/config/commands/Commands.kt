@@ -56,6 +56,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
+import at.hannibal2.skyhanni.features.misc.ColourDisplay
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
@@ -170,7 +171,6 @@ object Commands {
         )
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
-
 
     private fun usersNormal() {
         registerCommand(
@@ -336,6 +336,12 @@ object Commands {
             "shtpinfested",
             "Teleports you to the nearest infested plot",
         ) { PestFinder.teleportNearestInfestedPlot() }
+        registerCommand(
+            "shcolor",
+            "Shows table for minecraft formatting",
+        ) {
+            ColourDisplay.onCommand()
+        }
     }
 
     private fun usersBugFix() {

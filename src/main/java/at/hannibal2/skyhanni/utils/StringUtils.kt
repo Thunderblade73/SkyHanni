@@ -245,7 +245,6 @@ object StringUtils {
         } ?: text
     }
 
-
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
      * @param list - the list of strings to join into a string, containing 0 or more elements.
@@ -558,5 +557,19 @@ object StringUtils {
 
     fun String.width(): Int {
         return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    }
+
+    fun String.getFontLength() = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+
+    fun List<String>.equalSizeInFont(usesDots: Boolean = false): List<String> {
+        val lengthOfLongestLine = this.maxOf { it.getFontLength() }
+        val array = ArrayList<String>(this.size)
+        for (line in this) {
+            val size = line.getFontLength()
+            val diff = lengthOfLongestLine - size
+            val spaces = diff / 4
+            array.add(line.padEnd(line.length + spaces))
+        }
+        return array
     }
 }
