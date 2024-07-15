@@ -19,6 +19,7 @@ jobs:
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN}}
                     script: |
+                        const draft = github.event.pull_request.draft
                         if(!draft && process.env.TITLE.split(":")[0].toUpperCase().includes("FIX")){
                             github.rest.issues.addLabels({
                                 issue_number: context.issue.number,
