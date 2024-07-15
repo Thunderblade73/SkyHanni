@@ -11,6 +11,7 @@ jobs:
             contents: read
         steps:
             -   name: label
+                if: ${{ github.event.pull_request.state == "open" }}
                 env:
                     TITLE: ${{ github.event.pull_request.title }}
                     LABEL: Bug Fix - Sooner than Very Soon
