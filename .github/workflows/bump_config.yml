@@ -24,24 +24,13 @@ jobs:
             -   name: Check for configFixes Template
                 id: check-template
                 run: |
-                    ignored_files=(
-                    "src/main/java/at/hannibal2/skyhanni/config/ConfigUpdaterMigrator.kt"
-                    "build.gradle.kts"
-                    )
-    
+                    ignored_file="src/main/java/at/hannibal2/skyhanni/config/ConfigUpdaterMigrator.kt"
+        
                     replacement_made=false
-    
+        
                     find . -type f | while read -r file; do
-                            skip=false
-                                for ignored_file in "${ignored_files[@]}"; do
-                                if [[ "$file" == "$ignored_file" ]]; then
-                                    skip=true
-                                    break
-                            fi
-                        done
-                        
-                        if [[ "$skip" == true ]]; then
-                        continue
+                        if [[ "$file" == "$ignored_file" ]]; then
+                            continue
                         fi
                         
                         if grep -q "CONFIG_MOVE_VERSION" "$file"; then
