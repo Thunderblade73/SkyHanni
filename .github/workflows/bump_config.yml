@@ -30,27 +30,34 @@ jobs:
         
                     find . -type f | while read -r file; do
                         if [[ "$file" == "$ignored_file" ]]; then
+                            echo "Skipped"
                             continue
                         fi
-                        
+                        echo "other file"
                         if grep -q "CONFIG_MOVE_VERSION" "$file"; then
                             while IFS= read -r line; do
                                 if [[ "$line" =~ import[[:space:]]+at\.project\.config\.CONFIG_MOVE_VERSION ]]; then
                                 # Remove the line if it's an import statement
                                     sed -i.bak "/$line/d" "$file"
+                                    echo "Removed Import"
                                 else
-                                # Replace CONFIG_MOVE_VERSION in non-import lines
-                                sed -i.bak "s/CONFIG_MOVE_VERSION/$CONFIG_VERSION/g" "$file"
-                                replacement_made=true
+                                    # Replace CONFIG_MOVE_VERSION in non-import lines
+                                    sed -i.bak "s/CONFIG_MOVE_VERSION/$CONFIG_VERSION/g" "$file"
+                                    replacement_made=true
+                                    echo "Replaced"
                                 fi
                             done < "$file"
                         fi
                     done
                     
+                    echo "Close"
+                    
                     if [[ "$replacement_made" == true ]]; then
-                      echo "REPLACEMENT_MADE=true" >> $GITHUB_ENV
+                        echo "REPLACEMENT_MADE=true" >> $GITHUB_ENV
+                        echo "Has replaced"
                     else
-                      echo "REPLACEMENT_MADE=false" >> $GITHUB_ENV
+                        echo "REPLACEMENT_MADE=false" >> $GITHUB_ENV
+                        echo "Hasn't replaced"
                     fi
 
             -   name: Increment Config Version
