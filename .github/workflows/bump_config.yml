@@ -24,30 +24,24 @@ jobs:
             -   name: Check for configFixes Template
                 id: check-template
                 run: |
-                    ignored_files = ("src/main/java/at/hannibal2/skyhanni/config/ConfigUpdaterMigrator.kt")
+                    ignored_file = "src/main/java/at/hannibal2/skyhanni/config/ConfigUpdaterMigrator.kt"
                     
                     find . -type f | while read file; do
-                        skip=false
-                        for pattern in "${ignored_files[@]}"; do
-                        if [[ "$file" == $pattern ]]; then
-                        skip=true
-                        break
-                        fi
-                    done
+                    if [[ "$file" == "$ignored_file" ]]; then
+                        continue
+                    fi
                     
-                    if [[ "$skip" == false ]]; then
-                        if grep -q "CONFIG_MOVE_VERSION" "$file"; then
-                            while IFS= read -r line; do
-                                if [[ "$line" =~ import[[:space:]]+at\.project\.config\.CONFIG_MOVE_VERSION ]]; then
-                                # Remove the line if it's an import statement
-                                    sed -i.bak "/$line/d" "$file"
-                                else
-                                # Replace CONFIG_MOVE_VERSION in non-import lines
-                                sed -i.bak "s/CONFIG_MOVE_VERSION/$CONFIG_VERSION/g" "$file"
-                                replacement_made=true
-                                fi
-                            done < "$file"
-                        fi
+                    if grep -q "CONFIG_MOVE_VERSION" "$file"; then
+                        while IFS= read -r line; do
+                            if [[ "$line" =~ import[[:space:]]+at\.project\.config\.CONFIG_MOVE_VERSION ]]; then
+                            # Remove the line if it's an import statement
+                                sed -i.bak "/$line/d" "$file"
+                            else
+                            # Replace CONFIG_MOVE_VERSION in non-import lines
+                            sed -i.bak "s/CONFIG_MOVE_VERSION/$CONFIG_VERSION/g" "$file"
+                            replacement_made=true
+                            fi
+                        done < "$file"
                     fi
                     done
                     
