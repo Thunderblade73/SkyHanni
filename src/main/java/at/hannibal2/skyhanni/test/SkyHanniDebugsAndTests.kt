@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.CONFIG_MOVE_VERSION
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -134,6 +135,7 @@ object SkyHanniDebugsAndTests {
     }
 
     fun testCommand(args: Array<String>) {
+        println(CONFIG_MOVE_VERSION)
         SkyHanniMod.coroutineScope.launch {
             asyncTest(args)
         }
