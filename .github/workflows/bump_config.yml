@@ -1,0 +1,76 @@
+name: Update Config Version
+
+on:
+    pull_request:
+        types:
+            - closed  # Only trigger on PR merge
+
+jobs:
+    update-config:
+        if: github.event.pull_request.merged == true
+        runs-on: ubuntu-latest
+        env:
+            VERSION_FILE : Config_Version
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v4
+
+            -   name: Checkout Repository
+                run: |
+                    old_version = cat $VERSION_FILE
+                    new_version = old_version + 1
+                    echo "CONFIG_VERSION=${old_version}" >> $GITHUB_ENV
+
+            -   name: Check for configFixes Template
+                id: check-template
+                run: |
+                    ignored_files = ["src/main/java/at/hannibal2/skyhanni/config/ConfigUpdaterMigrator.kt"]
+                    
+                    find . -type f | while read file; do
+                        skip=false
+                        for pattern in "${ignored_files[@]}"; do
+                        if [[ "$file" == $pattern ]]; then
+                        skip=true
+                        break
+                        fi
+                    done
+                    
+                    if [[ "$skip" == false ]]; then
+                        if grep -q "CONFIG_MOVE_VERSION" "$file"; then
+                            while IFS= read -r line; do
+                                if [[ "$line" =~ import[[:space:]]+at\.project\.config\.CONFIG_MOVE_VERSION ]]; then
+                                # Remove the line if it's an import statement
+                                    sed -i.bak "/$line/d" "$file"
+                                else
+                                # Replace CONFIG_MOVE_VERSION in non-import lines
+                                sed -i.bak "s/CONFIG_MOVE_VERSION/${{ env.CONFIG_VERSION }}/g" "$file"
+                                replacement_made=true
+                                fi
+                            done < "$file"
+                        fi
+                    fi
+                    done
+                    
+                    if [[ "$replacement_made" == true ]]; then
+                      echo "REPLACEMENT_MADE=true" >> $GITHUB_ENV
+                    else
+                      echo "REPLACEMENT_MADE=false" >> $GITHUB_ENV
+                    fi
+
+            -   name: Increment Config Version
+                if: env.contains_fixes == 'true'
+                run: |
+                    echo $CONFIG_VERSION > $VERSION_FILE
+
+            -   name: Commit Changes
+                if: env.contains_fixes == 'true'
+                run: |
+                    git config user.name "GitHub Actions"
+                    git config user.email "actions@github.com"
+                    git add .
+                    git commit -m "Bumped configVersion to $CONFIG_VERSION"
+
+            -   name: Push Changes
+                if: env.contains_fixes == 'true'
+                run: |
+                    git push origin HEAD
