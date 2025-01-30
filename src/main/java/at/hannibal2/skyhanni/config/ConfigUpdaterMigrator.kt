@@ -26,7 +26,7 @@ object ConfigUpdaterMigrator {
     var hasAMove = 0
 
     private val replacedConfigVersion = "@CONFIG_VERSION@".toInt()
-    val CONFIG_VERSION = replacedConfigVersion + hasAMove
+    val CONFIG_VERSION get() = replacedConfigVersion + hasAMove
 
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
