@@ -137,6 +137,7 @@ object SkyHanniDebugsAndTests {
     fun testCommand(args: Array<String>) {
         println(CONFIG_MOVE_VERSION)
         println(CONFIG_MOVE_VERSION)
+        println(CONFIG_MOVE_VERSION)
         SkyHanniMod.coroutineScope.launch {
             asyncTest(args)
         }
