@@ -76,14 +76,14 @@ object ShaderHelper {
     fun glGetProgramInfoLog(program: Int, maxLength: Int): String {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetInfoLogARB(
             program,
-            maxLength
+            maxLength,
         ) else GL20.glGetProgramInfoLog(program, maxLength)
     }
 
     fun glGetProgramInt(program: Int, pName: Int): Int {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetObjectParameteriARB(
             program,
-            pName
+            pName,
         ) else GL20.glGetProgrami(program, pName)
     }
 
@@ -94,7 +94,7 @@ object ShaderHelper {
     fun glAttachShader(program: Int, shaderIn: Int) {
         if (USING_ARB_SHADERS) ARBShaderObjects.glAttachObjectARB(program, shaderIn) else GL20.glAttachShader(
             program,
-            shaderIn
+            shaderIn,
         )
     }
 
@@ -105,7 +105,7 @@ object ShaderHelper {
     fun glShaderSource(shader: Int, source: CharSequence) {
         if (USING_ARB_SHADERS) ARBShaderObjects.glShaderSourceARB(shader, source) else GL20.glShaderSource(
             shader,
-            source
+            source,
         )
     }
 
@@ -116,14 +116,14 @@ object ShaderHelper {
     fun glGetShaderInt(shader: Int, pName: Int): Int {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetObjectParameteriARB(
             shader,
-            pName
+            pName,
         ) else GL20.glGetShaderi(shader, pName)
     }
 
     fun glGetShaderInfoLog(shader: Int, maxLength: Int): String {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetInfoLogARB(
             shader,
-            maxLength
+            maxLength,
         ) else GL20.glGetShaderInfoLog(shader, maxLength)
     }
 
@@ -143,7 +143,7 @@ object ShaderHelper {
         if (USING_ARB_SHADERS) ARBShaderObjects.glUniform2fARB(location, v0, v1) else GL20.glUniform2f(
             location,
             v0,
-            v1
+            v1,
         )
     }
 
@@ -152,14 +152,24 @@ object ShaderHelper {
             location,
             v0,
             v1,
-            v2
+            v2,
+        )
+    }
+
+    fun glUniform4f(location: Int, v0: Float, v1: Float, v2: Float, v3: Float) {
+        if (USING_ARB_SHADERS) ARBShaderObjects.glUniform4fARB(location, v0, v1, v2, v3) else GL20.glUniform4f(
+            location,
+            v0,
+            v1,
+            v2,
+            v3,
         )
     }
 
     fun glGetUniformLocation(program: Int, name: CharSequence): Int {
         return if (USING_ARB_SHADERS) ARBShaderObjects.glGetUniformLocationARB(
             program,
-            name
+            name,
         ) else GL20.glGetUniformLocation(program, name)
     }
 
