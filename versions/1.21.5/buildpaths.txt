@@ -1474,6 +1474,7 @@ at/hannibal2/skyhanni/config/features/gui/customscoreboard/MaxwellConfig.kt
 at/hannibal2/skyhanni/config/features/gui/customscoreboard/MayorConfig.kt
 at/hannibal2/skyhanni/config/features/gui/customscoreboard/PartyConfig.kt
 at/hannibal2/skyhanni/config/features/gui/customscoreboard/TitleAndFooterConfig.kt
+at/hannibal2/skyhanni/config/features/hunting/HuntingConfig.kt
 at/hannibal2/skyhanni/config/features/inventory/AttributeOverlayConfig.java
 at/hannibal2/skyhanni/config/features/inventory/AuctionHouseConfig.java
 at/hannibal2/skyhanni/config/features/inventory/AuctionHousePriceComparisonConfig.java

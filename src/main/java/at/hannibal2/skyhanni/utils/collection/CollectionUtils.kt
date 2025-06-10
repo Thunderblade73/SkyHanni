@@ -358,6 +358,15 @@ object CollectionUtils {
         }
     }
 
+    fun <K, V> MutableMap<K, V>.removeIfValue(predicate: (V) -> Boolean) {
+        val iterator = this.entries.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next().value)) {
+                iterator.remove()
+            }
+        }
+    }
+
     fun <K, V> LinkedHashMap<K, V>.putAt(index: Int, key: K, value: V) {
         val entries = LinkedHashMap<K, V>()
         var currentIndex = 0

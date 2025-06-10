@@ -117,6 +117,7 @@ object CopyNearbyEntitiesCommand {
                     //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
                     //$$ is net.minecraft.entity.passive.TropicalFishEntity -> addTropicalFish(entity)
                     //$$ is net.minecraft.entity.mob.ShulkerEntity -> addShulker(entity)
+                    //$$ is net.minecraft.entity.passive.PandaEntity -> addPanda(entity)
                     //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
@@ -251,6 +252,26 @@ object CopyNearbyEntitiesCommand {
     //$$     val attachedFace = entity.attachedFace
     //$$     add("-  color: $color")
     //$$     add("-  attachedFace: $attachedFace")
+    //$$ }
+    //$$
+    //$$ private fun MutableList<String>.addPanda(entity: net.minecraft.entity.passive.PandaEntity) {
+    //$$     add("PandaEntity:")
+    //$$     val mainGene = entity.mainGene.asString()
+    //$$     val hiddenGene = entity.hiddenGene.asString()
+    //$$     val playingTicks = entity.playingTicks
+    //$$     val bambooAskTicks = entity.askForBambooTicks
+    //$$     val isEating = entity.isEating
+    //$$     val age = entity.breedingAge
+    //$$     val sneezeProgress = entity.sneezeProgress
+    //$$     val scale = entity.scale
+    //$$     add("-  mainGene: $mainGene")
+    //$$     add("-  hiddenGene: $hiddenGene")
+    //$$     add("-  playingTicks: $playingTicks")
+    //$$     add("-  bambooAskTicks: $bambooAskTicks")
+    //$$     add("-  isEating: $isEating")
+    //$$     add("-  age: $age")
+    //$$     add("-  sneezeProgress: $sneezeProgress")
+    //$$     add("-  scale: $scale")
     //$$ }
     //#endif
 
