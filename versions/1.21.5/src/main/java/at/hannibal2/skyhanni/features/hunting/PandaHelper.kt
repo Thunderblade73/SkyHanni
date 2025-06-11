@@ -13,17 +13,18 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.hunting.PandaHelper.format
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -34,7 +35,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import net.minecraft.entity.passive.PandaEntity
-import net.minecraft.item.Items
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -77,10 +77,12 @@ object PandaHelper {
         data.updateEntity(entity)
     }
 
+    private val BAMBOO = "BAMBOO".toInternalName()
+
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onEntityClick(event: EntityClickEvent) {
         val data = pandaData[event.clickedEntity?.id ?: return] ?: return
-        if (event.itemInHand?.item != Items.BAMBOO) return
+        if (event.itemInHand?.getInternalNameOrNull() != BAMBOO) return
         data.feed()
         remembered = data
     }
@@ -90,7 +92,7 @@ object PandaHelper {
         pandaData.forEach { _, data ->
             if (!data.location.canBeSeen()) return@forEach
             data.display.forEachIndexed { i, line ->
-                event.drawString(data.location.add(y = 1.0 * i), line, seeThroughBlocks = false)
+                event.drawString(data.location.add(y = 0.05 * i + 2.0), line, seeThroughBlocks = true)
             }
         }
     }
@@ -112,7 +114,7 @@ object PandaHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onKeyPress(event: KeyPressEvent) {
-        if(event.keyCode != config.pathToRemembered) return
+        if (event.keyCode != config.pathToRemembered) return
         pathToRememberedPanda()
     }
 
@@ -126,7 +128,7 @@ object PandaHelper {
         config.enabled.onDisable {
             clear()
         }
-        if(!IslandType.GALATEA.isCurrent()) return
+        if (!IslandType.GALATEA.isCurrent()) return
         config.enabled.onEnable {
             MobData.skyblockMobs.forEach { handleMobIn(it) }
         }
@@ -165,7 +167,10 @@ object PandaHelper {
 
         fun updatePosition() {
             val newLocation = EntityUtils.getEntityByID(id)?.getLorenzVec()
-            if (newLocation == null) return
+            if (newLocation == null) {
+                if (location.canBeSeen(viewDistance = 30.0)) lifeTime = SimpleTimeMark.farPast()
+                return
+            }
             location = newLocation
             lifeTime = refreshLifetime()
         }
@@ -203,8 +208,8 @@ object PandaHelper {
     }
 
     private fun PandaLines.format(data: PandaData) = when (this) {
-        PandaLines.UNTIL_TOTAL -> "Needs ${data.stage.cumulativeMin}x-${data.stage.cumulativeMax}x"
-        PandaLines.UNTIL_STAGE -> "Stage needs ${data.stage.min}x-${data.stage.max}x"
+        PandaLines.UNTIL_TOTAL -> "Needs ${data.stage.cumulativeMin - data.feed}x-${data.stage.cumulativeMax - data.feed}x"
+        PandaLines.UNTIL_STAGE -> "Stage needs ${data.stage.min - data.feedStage}x-${data.stage.max - data.feedStage}x"
         PandaLines.FEED_TOTAL -> "Feed ${data.feed}x"
         PandaLines.FEED_STAGE -> "Stage feed ${data.feedStage}x"
     }
@@ -217,7 +222,7 @@ object PandaHelper {
         } ?: PandaStage.DONE
     }
 
-    private enum class PandaStage(val isBaby: Boolean, val scale: Float, median: Int, deviation: Int) {
+    enum class PandaStage(val isBaby: Boolean, val scale: Float, median: Int, deviation: Int) {
         BASE(true, 0.8f, 4, 0),
         STAGE1(true, 1f, 5, 1),
         STAGE2(true, 1.2f, 6, 1),
@@ -226,10 +231,11 @@ object PandaHelper {
         STAGE5(false, 1.2f, 10, 0),
         DONE(false, Float.MAX_VALUE, 0, 0)
         ;
+
         val min = median - deviation
         val max = median + deviation
 
-        val cumulativeMin = entries.subList(ordinal, entries.size).sumOf { it.min }
-        val cumulativeMax = entries.subList(ordinal, entries.size).sumOf { it.max }
+        val cumulativeMin by lazy { entries.subList(ordinal, entries.size).sumOf { it.min } }
+        val cumulativeMax by lazy { entries.subList(ordinal, entries.size).sumOf { it.max } }
     }
 }
