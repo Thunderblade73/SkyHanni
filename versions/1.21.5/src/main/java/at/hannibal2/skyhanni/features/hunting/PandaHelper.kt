@@ -213,11 +213,11 @@ object PandaHelper {
         val isBaby = this.isBaby
         val scale = this.scale
         return PandaStage.entries.firstOrNull {
-            it.isBaby == isBaby && scale == scale
+            it.isBaby == isBaby && it.scale == scale
         } ?: PandaStage.DONE
     }
 
-    private enum class PandaStage(val isBaby: Boolean, val scale: Float, val median: Int, val deviation: Int) {
+    private enum class PandaStage(val isBaby: Boolean, val scale: Float, median: Int, deviation: Int) {
         BASE(true, 0.8f, 4, 0),
         STAGE1(true, 1f, 5, 1),
         STAGE2(true, 1.2f, 6, 1),
@@ -226,9 +226,6 @@ object PandaHelper {
         STAGE5(false, 1.2f, 10, 0),
         DONE(false, Float.MAX_VALUE, 0, 0)
         ;
-
-        fun next() = entries[ordinal % entries.size]
-
         val min = median - deviation
         val max = median + deviation
 

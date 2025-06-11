@@ -723,6 +723,7 @@ at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventVoting
 at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventWinter.kt
 at.hannibal2.skyhanni.features.gui.quiver.QuiverDisplay.kt
 at.hannibal2.skyhanni.features.gui.quiver.QuiverWarning.kt
+at.hannibal2.skyhanni.features.hunting.PandaHelper.kt
 at.hannibal2.skyhanni.features.inventory.ActiveBeaconEffect.kt
 at.hannibal2.skyhanni.features.inventory.AuctionOutbidWarning.kt
 at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter.kt

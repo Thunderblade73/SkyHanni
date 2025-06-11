@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -38,9 +38,9 @@ class HuntingConfig {
         var enabled: Property<Boolean> = Property.of(true)
 
         @Expose
-        @ConfigOption(name = "Information", desc = "Information that is shown by the helper above a panda")
-        @ConfigEditorDropdown
-        var whatToShow: Property<List<PandaLines>> = Property.of(listOf(PandaLines.UNTIL_STAGE, PandaLines.UNTIL_TOTAL))
+        @ConfigOption(name = "Information", desc = "Information that is shown by the helper above a Panda.")
+        @ConfigEditorDraggableList
+        var whatToShow: Property<MutableList<PandaLines>> = Property.of(mutableListOf(PandaLines.UNTIL_STAGE, PandaLines.UNTIL_TOTAL))
 
         @Expose
         @ConfigOption(name = "Remember last Panda", desc = "Remembers the last Panda you feed.")
@@ -48,7 +48,7 @@ class HuntingConfig {
         var remember = false
 
         @Expose
-        @ConfigOption(name = "Path to Remembered", desc = "By pressing your key you will be path to the last know location of your panda.")
+        @ConfigOption(name = "Path to Remembered", desc = "By pressing your key you will be path to the last know location of your Panda.")
         @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
         var pathToRemembered = Keyboard.KEY_NONE
 
