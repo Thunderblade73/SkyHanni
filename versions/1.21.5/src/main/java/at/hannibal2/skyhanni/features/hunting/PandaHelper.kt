@@ -71,6 +71,9 @@ object PandaHelper {
             it.updatePosition()
             it.stage == PandaStage.DONE || it.lifeTime.isInPast()
         }
+        if (remembered?.id?.let { pandaData[it] == null } == true) {
+            remembered = null
+        }
         val target = MobUtils.rayTraceForMob(MinecraftCompat.localPlayer, 0f) ?: return
         val data = pandaData[target.id] ?: return
         val entity = target.baseEntity as? PandaEntity ?: return
@@ -90,9 +93,9 @@ object PandaHelper {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onSkyHanniRenderWorld(event: SkyHanniRenderWorldEvent) {
         pandaData.forEach { _, data ->
-            if (!data.location.canBeSeen()) return@forEach
-            data.display.forEachIndexed { i, line ->
-                event.drawString(data.location.add(y = 0.05 * i + 2.0), line, seeThroughBlocks = true)
+            if (data.location.distanceSqToPlayer() > 20 * 20) return@forEach
+            data.display.reversed().forEachIndexed { i, line ->
+                event.drawString(data.location.add(y = data.stage.textHeight + 0.26 * i), line, seeThroughBlocks = false)
             }
         }
     }
@@ -106,7 +109,7 @@ object PandaHelper {
 
                 addAll(data.display.map { RenderableString(it) })
 
-                add(Renderable.clickable("§lPath to Panda", ::pathToRememberedPanda))
+                add(Renderable.clickable("§l§ePath to Panda", ::pathToRememberedPanda))
             },
             posLabel = "Panda Hud",
         )
@@ -154,6 +157,10 @@ object PandaHelper {
         var lifeTime: SimpleTimeMark = refreshLifetime()
 
         var display = emptyList<String>()
+
+        init {
+            updateDisplay()
+        }
 
         private fun refreshLifetime() = 5.0.minutes.fromNow()
 
@@ -208,10 +215,30 @@ object PandaHelper {
     }
 
     private fun PandaLines.format(data: PandaData) = when (this) {
-        PandaLines.UNTIL_TOTAL -> "Needs ${data.stage.cumulativeMin - data.feed}x-${data.stage.cumulativeMax - data.feed}x"
-        PandaLines.UNTIL_STAGE -> "Stage needs ${data.stage.min - data.feedStage}x-${data.stage.max - data.feedStage}x"
-        PandaLines.FEED_TOTAL -> "Feed ${data.feed}x"
-        PandaLines.FEED_STAGE -> "Stage feed ${data.feedStage}x"
+        PandaLines.UNTIL_TOTAL -> {
+            val min = data.stage.cumulativeMin - data.feedStage
+            val max = data.stage.cumulativeMax - data.feedStage
+            when {
+                max <= 0 -> "§eNeeds §ba few more §eto finish"
+                min <= 0 -> "§b~$max§7x§e to finish"
+                min == max -> "§b$max§7x§e to finish"
+                else -> "§b$min§7x§e-§b$max§7x§e to finish"
+            }
+        }
+
+        PandaLines.UNTIL_STAGE -> {
+            val min = data.stage.min - data.feedStage
+            val max = data.stage.max - data.feedStage
+            when {
+                max <= 0 -> "§eNeeds §ba few more §eto grow"
+                min <= 0 -> "§b~$max§7x§e to grow"
+                min == max -> "§b$max§7x§e to grow"
+                else -> "§b$min§7x§e-§b$max§7x§e to grow"
+            }
+        }
+
+        PandaLines.FEED_TOTAL -> "§eFeed §b${data.feed}§7x§e in total"
+        PandaLines.FEED_STAGE -> "§eFeed §b${data.feedStage}§7x§e to grow"
     }
 
     private fun PandaEntity.getStage(): PandaStage {
@@ -237,5 +264,11 @@ object PandaHelper {
 
         val cumulativeMin by lazy { entries.subList(ordinal, entries.size).sumOf { it.min } }
         val cumulativeMax by lazy { entries.subList(ordinal, entries.size).sumOf { it.max } }
+
+        val textHeight : Float = if (isBaby) {
+            scale
+        } else {
+            scale + 0.7f
+        }
     }
 }
