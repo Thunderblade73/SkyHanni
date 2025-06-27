@@ -691,6 +691,7 @@ object ComposterOverlay {
             ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
         }
         event.move(CONFIG_MOVE_VERSION,"","")
+        event.move(CONFIG_MOVE_VERSION,"","")
     }
 
     @HandleEvent
