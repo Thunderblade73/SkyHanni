@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.CONFIG_MOVE_VERSION
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -689,6 +690,7 @@ object ComposterOverlay {
         event.transform(15, "garden.composters.retrieveFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
         }
+        event.move(CONFIG_MOVE_VERSION, "garden.composterOverlay", "garden.composters.overlay")
     }
 
     @HandleEvent
