@@ -139,6 +139,8 @@ object MobDetection {
         if (forceReset) {
             mobDetectionReset() // Ensure that all mobs are cleared 100%
         }
+
+        if (SkyHanniMod.feature.dev.mobDebug.mobDetection.watchdog) watchdog()
     }
 
     /** Splits the entity into player, displayNPC and other */

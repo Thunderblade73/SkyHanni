@@ -33,6 +33,11 @@ class DebugMobConfig {
         var logEvents: Boolean = false
 
         @Expose
+        @ConfigOption(name = "Enable Watchdog", desc = "Enables the watchdog to check invalid internal state of the mob detection.")
+        @ConfigEditorBoolean
+        var watchdog: Boolean = false
+
+        @Expose
         @ConfigOption(name = "Show RayHit", desc = "Highlights the mob that is currently in front of your view.")
         @ConfigEditorBoolean
         var showRayHit: Boolean = false
