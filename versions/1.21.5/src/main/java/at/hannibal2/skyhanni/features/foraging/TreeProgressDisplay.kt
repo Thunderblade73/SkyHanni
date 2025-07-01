@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -38,8 +40,7 @@ object TreeProgressDisplay {
             display = null
             return
         }
-        for (entity in EntityUtils.getAllEntities()) {
-            if (entity !is ArmorStandEntity) continue
+        for (entity in EntityUtils.getEntitiesNearbyIgnoreY<ArmorStandEntity>(LocationUtils.playerLocation(),20.0)) {
             val name = entity.displayName.formattedTextCompat()
             ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
                 if (config.compact) {
