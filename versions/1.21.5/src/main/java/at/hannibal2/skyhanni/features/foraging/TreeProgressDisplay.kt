@@ -4,16 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEventLate
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -25,6 +27,7 @@ object TreeProgressDisplay {
 
     private val config get() = SkyHanniMod.feature.foraging.trees.progress
     private var display: Renderable? = null
+    private var armorstandId: Int? = null
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -34,24 +37,33 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onTick() {
+    fun onEntityEnterWorld(event: EntityEnterWorldEventLate<ArmorStandEntity>) {
         if (!config.enabled) return
-        if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
+        val name = event.entity.displayName.formattedTextCompat()
+        if (ModernPatterns.currentTreeProgressPattern.matches(name)) {
+            armorstandId = event.entity.id
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!config.enabled && event.isMod(4)) return
+        val armorstand = armorstandId?.let { EntityUtils.getEntityByID(it) } ?: run {
             display = null
+            armorstandId = null
             return
         }
-        for (entity in EntityUtils.getEntitiesNearbyIgnoreY<ArmorStandEntity>(LocationUtils.playerLocation(),20.0)) {
-            val name = entity.displayName.formattedTextCompat()
-            ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
-                if (config.compact) {
-                    display = StringRenderable("${group("treeType")} §b§l${group("percent")}%")
-                } else {
-                    display = StringRenderable(name)
+        display = if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
+            null
+        } else {
+            val name = armorstand.displayName.formattedTextCompat()
+            if (config.compact) {
+                ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
+                    StringRenderable("${group("treeType")} §b§l${group("percent")}%")
                 }
-                return
-
+            } else {
+                StringRenderable(name)
             }
         }
-        display = null
     }
 }

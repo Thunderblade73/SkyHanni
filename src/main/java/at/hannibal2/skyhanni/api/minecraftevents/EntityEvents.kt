@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.data.EntityData
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobDetection
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EndermanTeleportEvent
 import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -20,7 +20,7 @@ object EntityEvents {
 
     @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
-        EntityEnterWorldEvent(event.entity).post()
+        EntityData.spawnEntity(event.entity)
     }
 
     @SubscribeEvent

@@ -4,14 +4,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEventLate
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.BatchedQueue
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
@@ -24,9 +27,16 @@ object EntityData {
     private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Entity, Pair<SimpleTimeMark, Boolean>>(500.milliseconds)
+    private val lateEnter = BatchedQueue<Int>(5)
+
 
     @HandleEvent
     fun onTick() {
+        lateEnter.endBatch()
+        for (id in lateEnter.drainBatch()){
+            val entity = EntityUtils.getEntityByID(id) ?: continue
+            EntityEnterWorldEventLate(entity).post()
+        }
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) { // this completely ignores the ignored entities list?
             val maxHealth = entity.baseMaxHealth
             val id = entity.entityId
@@ -36,6 +46,11 @@ object EntityData {
                 EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).post()
             }
         }
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        lateEnter.clear()
     }
 
     @HandleEvent
@@ -55,6 +70,12 @@ object EntityData {
 
     @JvmStatic
     fun despawnEntity(entity: Entity) {
+        EntityLeaveWorldEvent(entity).post()
+    }
+
+    @JvmStatic
+    fun spawnEntity(entity: Entity) {
+        lateEnter.add(entity.entityId)
         EntityLeaveWorldEvent(entity).post()
     }
 

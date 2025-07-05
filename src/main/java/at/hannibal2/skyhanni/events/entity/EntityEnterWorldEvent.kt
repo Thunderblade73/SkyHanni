@@ -4,3 +4,5 @@ import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.entity.Entity
 
 class EntityEnterWorldEvent<T : Entity>(val entity: T) : GenericSkyHanniEvent<T>(entity.javaClass)
+
+class EntityEnterWorldEventLate<T : Entity>(val entity: T) : GenericSkyHanniEvent<T>(entity.javaClass)

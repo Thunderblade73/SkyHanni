@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent;
+import at.hannibal2.skyhanni.data.EntityData;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +13,7 @@ public class MixinClientWorld {
 
     @Inject(method = "addEntity", at = @At("HEAD"))
     private void onAddEntity(Entity entity, CallbackInfo ci) {
-        new EntityEnterWorldEvent(entity).post();
+        EntityData.spawnEntity(entity);
     }
 
 }
