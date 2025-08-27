@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.Position.BorderState
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -93,7 +94,7 @@ object GuiEditManager {
         SkyHanniMod.shouldCloseScreen = false
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
-            2,
+            4, // TODO make dynamic on Resolution
             Minecraft.getMinecraft().currentScreen as? GuiContainer,
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
@@ -127,15 +128,28 @@ object GuiEditManager {
 
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
 
-    fun Position.getDummySize(random: Boolean = false): Vector2i {
+    fun Position.getDummySize(random: Boolean = false, actual : Vector2i = getActualSize(random)): Vector2i {
+        return Vector2i(
+            if (horizontalState == BorderState.BOTH && centerXSize != null) centerXSize!! else actual.x,
+            if (verticalState == BorderState.BOTH && centerYSize != null) centerYSize!! else actual.y,
+        )
+    }
+
+    fun Position.getActualSize(random: Boolean = false): Vector2i {
         if (random) return Vector2i(5, 5)
         val (x, y) = currentBorderSize[internalName] ?: return Vector2i(1, 1)
         return Vector2i((x * effectiveScale).toInt(), (y * effectiveScale).toInt())
     }
 
-    fun Position.getAbsX() = getAbsX0(getDummySize(true).x)
+    fun Position.getAbs(): Triple<Vector2i, Int, Int> {
+        val size = getActualSize()
+        val dummy = getDummySize(actual = size)
+        return Triple(size, getAbsX0(dummy.x), getAbsY0(dummy.y))
+    }
 
-    fun Position.getAbsY() = getAbsY0(getDummySize(true).y)
+    fun Position.getAbsX() = getAbsX0(getDummySize().x)
+
+    fun Position.getAbsY() = getAbsY0(getDummySize().y)
 
     fun handleGuiPositionMoved(guiName: String) {
         lastMovedGui = guiName
@@ -143,4 +157,22 @@ object GuiEditManager {
 }
 
 // TODO remove
-class Vector2i(val x: Int, val y: Int)
+data class Vector2i(val x: Int, val y: Int)
+
+fun Position.toggleBorderOld(border: Position.Border) = when (border) {
+    Position.Border.TOP, Position.Border.BOTTOM -> verticalState = getNextState(verticalState, border == Position.Border.TOP, true)
+    Position.Border.LEFT, Position.Border.RIGHT -> horizontalState = getNextState(horizontalState, border == Position.Border.LEFT, false)
+}
+
+private fun Position.getNextState(currentState: BorderState?, isFirstCase: Boolean, verticalOrHorizontal: Boolean): BorderState =
+    when (currentState) {
+        BorderState.NONE -> if (isFirstCase) BorderState.ONE else BorderState.TWO
+        BorderState.ONE -> if (isFirstCase) BorderState.NONE else BorderState.BOTH
+        BorderState.BOTH -> {
+            if (verticalOrHorizontal) centerYSize = Integer.MIN_VALUE else centerXSize = Integer.MIN_VALUE
+            if (isFirstCase) BorderState.TWO else BorderState.ONE
+        }
+
+        BorderState.TWO -> if (isFirstCase) BorderState.BOTH else BorderState.NONE
+        else -> if (isFirstCase) BorderState.NONE else BorderState.BOTH
+    }

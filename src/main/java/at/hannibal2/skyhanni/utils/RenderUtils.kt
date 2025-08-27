@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.GuiEditManager.getAbs
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
+import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
@@ -164,18 +166,21 @@ object RenderUtils {
     }
 
     fun Position.transform(): Pair<Int, Int> {
-        DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
-        DrawContextUtils.scale(effectiveScale, effectiveScale, 1F)
-        val x = ((GuiScreenUtils.mouseX - getAbsX()) / effectiveScale).toInt()
-        val y = ((GuiScreenUtils.mouseY - getAbsY()) / effectiveScale).toInt()
+        val (size,absX,absY) = getAbs()
+        val xScale = if(horizontalState == Position.BorderState.BOTH) centerXSize!!.toFloat()/size.x  else 1F
+        val yScale = if(verticalState == Position.BorderState.BOTH) centerYSize!!.toFloat()/size.y  else 1F
+        DrawContextUtils.translate(absX.toFloat(), absY.toFloat(), 0F)
+        DrawContextUtils.scale(effectiveScale * xScale, effectiveScale * yScale, 1F)
+        val x = ((GuiScreenUtils.mouseX - absX) / effectiveScale).toInt()
+        val y = ((GuiScreenUtils.mouseY - absY) / effectiveScale).toInt()
         return x to y
     }
 
     @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
     fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string.isNullOrBlank()) return
-        val x = renderString0(string, offsetX, offsetY, centerX)
         GuiEditManager.add(this, posLabel, x, 10)
+        val x = renderString0(string, offsetX, offsetY, centerX)
     }
 
     @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
@@ -213,6 +218,7 @@ object RenderUtils {
             }
             offsetY += 10 + extraSpace
         }
+        // TODO will fail
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
@@ -223,21 +229,22 @@ object RenderUtils {
         addToGuiManager: Boolean = true,
     ) {
         if (renderables.isEmpty()) return
-        var longestY = 0
+        var yOffset = 0
+        val longestY = renderables.sumOf { it.height }
         val longestX = renderables.maxOf { it.width }
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
         for (line in renderables) {
             DrawContextUtils.pushMatrix()
             val (x, y) = transform()
-            DrawContextUtils.translate(0f, longestY.toFloat(), 0F)
+            DrawContextUtils.translate(0f, yOffset.toFloat(), 0F)
             Renderable.withMousePosition(x, y) {
-                line.renderXAligned(0, longestY, longestX)
+                line.renderXAligned(0, yOffset, longestX)
             }
 
-            longestY += line.height + extraSpace + 2
+            yOffset += line.height + extraSpace + 2
 
             DrawContextUtils.popMatrix()
         }
-        if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
     fun Position.renderRenderable(
@@ -248,13 +255,13 @@ object RenderUtils {
         // cause crashes and errors on purpose
         DrawContextUtils.drawContext
         if (renderable == null) return
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
         DrawContextUtils.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
             renderable.render(0, 0)
         }
         DrawContextUtils.popMatrix()
-        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
     @Deprecated("Use ChromaColor instead")

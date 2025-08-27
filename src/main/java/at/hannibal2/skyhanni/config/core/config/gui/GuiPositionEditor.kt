@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -38,6 +39,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
+import java.awt.Color
 
 class GuiPositionEditor(
     private val positions: List<Position>,
@@ -47,10 +49,10 @@ class GuiPositionEditor(
 
     private var grabbedX = 0
     private var grabbedY = 0
-    private var clickedPos = -1
+    private var clickedPos: Position? = null
 
     override fun guiClosed() {
-        clickedPos = -1
+        clickedPos = null
         for (position in positions) {
             position.clicked = false
         }
@@ -75,17 +77,17 @@ class GuiPositionEditor(
         renderLabels(hoveredPos)
     }
 
-    private fun renderLabels(hoveredPos: Int) {
-        var displayPos = -1
-        if (clickedPos != -1 && positions[clickedPos].clicked) {
+    private fun renderLabels(hoveredPos: Position?) {
+        var displayPos: Position? = null
+        if (clickedPos?.clicked == true) {
             displayPos = clickedPos
         }
-        if (displayPos == -1) {
+        if (displayPos == null) {
             displayPos = hoveredPos
         }
 
         // When the mouse isn't currently hovering over a gui element
-        if (displayPos == -1) {
+        if (displayPos == null) {
             val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == Keyboard.KEY_NONE
             renderHover(
                 buildList {
@@ -98,7 +100,7 @@ class GuiPositionEditor(
             )
             return
         }
-        renderHover(getTextForPos(positions[displayPos]))
+        renderHover(getTextForPos(displayPos))
     }
 
     private fun getTextForPos(pos: Position): List<String> {
@@ -109,8 +111,9 @@ class GuiPositionEditor(
             "§b${pos.internalName}",
             "  §7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}",
             "",
-            "§eRight-Click to open associated config options!",
-            "§eUse Scroll-Wheel to resize!",
+            "§eHold §lShift §eto adjust borders!",
+            if (!KeyboardManager.isShiftKeyDown()) "§e§lRight-Click §eto open toggle!" else "§e§lRight-Click §eto set Border!",
+            "§eUse §lScroll-Wheel §eto resize!",
         )
     }
 
@@ -118,8 +121,8 @@ class GuiPositionEditor(
         RenderableTooltips.setTooltipForRender(text.map(StringRenderable::from))
     }
 
-    private fun renderRectangles(): Int {
-        var hoveredPos = -1
+    private fun renderRectangles(): Position? {
+        var hoveredPos: Position? = null
         DrawContextUtils.pushMatrix()
         width = getScaledWidth()
         height = getScaledHeight()
@@ -127,7 +130,7 @@ class GuiPositionEditor(
         val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
         var alreadyHadHover = false
-        for ((index, position) in positions.withIndex().reversed()) {
+        for (position in positions.reversed()) {
             var elementWidth = position.getDummySize(true).x
             var elementHeight = position.getDummySize(true).y
             if (position.clicked) {
@@ -154,14 +157,34 @@ class GuiPositionEditor(
             GuiRenderUtils.drawRect(
                 x - border,
                 y - border,
-                x + elementWidth + border * 2,
-                y + elementHeight + border * 2,
+                x + elementWidth + border,
+                y + elementHeight + border,
                 if (isHovering) selected else gray,
             )
 
+            val borderSelect = Color.GREEN//Color(selected, true).brighter()
+            val borderEnabled = Color.RED.addAlpha(100)
+
+            if (isHovering && KeyboardManager.isShiftKeyDown()) {
+                Position.Border.entries.forEach {
+                    it.drawRect(
+                        mouseX = mouseX,
+                        mouseY = mouseY,
+                        x = x,
+                        y = y,
+                        width = elementWidth,
+                        height = elementHeight,
+                        border = border,
+                        postion = position,
+                        hoveredColor = borderSelect,
+                        enabledColor = borderEnabled,
+                    )
+                }
+            }
+
             if (isHovering) {
                 alreadyHadHover = true
-                hoveredPos = index
+                hoveredPos = position
             }
         }
         DrawContextUtils.popMatrix()
@@ -190,11 +213,29 @@ class GuiPositionEditor(
             )
             if (!isHovered) continue
             if (mouseButton == 1) {
-                position.jumpToConfigOptions()
+                if (KeyboardManager.isShiftKeyDown()) {
+                    Position.Border.entries.forEach {
+                        if (it.isHovered(
+                                mouseX = mouseX,
+                                mouseY = mouseY,
+                                x = x,
+                                y = y,
+                                width = elementWidth,
+                                height = elementHeight,
+                                border = border,
+                            )
+                        ) {
+                            println("${it.name}: h= ${position.horizontalState} : v= ${position.verticalState}")
+                            position.toggleBorder(it)
+                        }
+                    }
+                } else {
+                    position.jumpToConfigOptions()
+                }
                 break
             }
             if (!position.clicked && mouseButton == 0) {
-                clickedPos = i
+                clickedPos = position
                 position.clicked = true
                 grabbedX = mouseX
                 grabbedY = mouseY
@@ -204,8 +245,7 @@ class GuiPositionEditor(
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
-        if (clickedPos == -1) return
-        val position = positions[clickedPos]
+        val position = clickedPos ?: return
         if (position.clicked) return
 
         val dist = if (KeyboardManager.isShiftKeyDown()) 10 else 1

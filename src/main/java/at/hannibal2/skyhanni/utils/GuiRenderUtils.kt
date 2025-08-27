@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
@@ -18,7 +19,9 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -28,12 +31,10 @@ import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
+import java.nio.FloatBuffer
 import java.text.DecimalFormat
 import kotlin.math.min
-//#if MC < 1.21
-import net.minecraft.client.renderer.GLAllocation
-import net.minecraft.client.renderer.OpenGlHelper
-import java.nio.FloatBuffer
+
 //#else
 //$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
 //$$ import com.mojang.blaze3d.systems.RenderSystem
@@ -189,6 +190,10 @@ object GuiRenderUtils {
             (bottom * inverseScale).toInt(),
             color,
         )
+    }
+
+    data class RectBox(val left: Int, val top: Int, val right: Int, val bottom: Int) {
+        fun draw(color: Int) = drawRect(left, top, right, bottom, color)
     }
 
     fun drawRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) {

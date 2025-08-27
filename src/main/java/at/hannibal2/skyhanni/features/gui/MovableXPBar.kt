@@ -27,9 +27,9 @@ object MovableXPBar {
         DrawContextUtils.pushMatrix()
         val x = GuiScreenUtils.scaledWindowWidth / 2 - 91
         val y = GuiScreenUtils.scaledWindowHeight - 29
+        GuiEditManager.add(config.position, "XP Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
         config.position.transform()
         DrawContextUtils.translate(-x.toFloat(), -y.toFloat(), 0f) // Must be after transform to work with scaling
-        GuiEditManager.add(config.position, "XP Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)

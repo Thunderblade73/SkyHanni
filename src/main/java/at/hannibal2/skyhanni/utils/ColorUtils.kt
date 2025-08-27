@@ -36,12 +36,27 @@ object ColorUtils {
     operator fun Color.component3(): Float = if (!tooltipFixBool) this.green / 255f else this.blue / 255f
     operator fun Color.component4(): Float = if (!tooltipFixBool) this.blue / 255f else this.alpha / 255f
 
-
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
         (start.green * (1 - percent) + end.green * percent).toInt(),
         (start.blue * (1 - percent) + end.blue * percent).toInt(),
     )
+
+    fun alphaBlend(top: Color, bottom: Color): Color {
+        val a1 = top.alpha / 255f
+        val a2 = bottom.alpha / 255f
+
+        val outA = a1 + a2 * (1f - a1)
+        if (outA == 0f) {
+            return Color(0, 0, 0, 0)
+        }
+
+        val r = (top.red / 255f * a1 + bottom.red / 255f * a2 * (1f - a1)) / outA
+        val g = (top.green / 255f * a1 + bottom.green / 255f * a2 * (1f - a1)) / outA
+        val b = (top.blue / 255f * a1 + bottom.blue / 255f * a2 * (1f - a1)) / outA
+
+        return Color(r, g, b, outA)
+    }
 
     val ChromaColour.rgb get() = this.toColor().rgb
 
